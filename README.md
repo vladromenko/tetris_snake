@@ -1,6 +1,10 @@
 **Tetris and Snake for Terminal and Desktop**
 - I built this Snake and Tetris after work simply because it's fun. Bare‑bones, no engines — just ncurses/Qt, build and play.
 
+<video controls src="tetris.mov" title="Title"></video>
+
+<video controls src="Snake.mov" title=""></video>
+
 If you already have everything installed (Homebrew, ncurses, Qt), just run:
 
 ```
@@ -11,7 +15,7 @@ git clone https://github.com/vladromenko/tetris_snake.git && cd tetris_snake && 
 Copy/paste this into Terminal — it installs Homebrew (if needed), sets PATH, installs deps, clones the repo, builds, and launches the menu:
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+/bin/bash -c "$(curl -fsцSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 if [ -x /opt/homebrew/bin/brew ]; then eval "$(/opt/homebrew/bin/brew shellenv)"; else eval "$(/usr/local/bin/brew shellenv)"; fi; \
 brew install ncurses qt git; \
 git clone https://github.com/vladromenko/tetris_snake.git; cd tetris_snake; make
