@@ -1,6 +1,12 @@
 **A Little After‑Hours Build**
 - I built this Snake and Tetris after work simply because it's fun. Bare‑bones, no engines — just ncurses/Qt, build and play.
 
+If you already have everything installed (Homebrew, ncurses, Qt), just run:
+
+```
+git clone https://github.com/vladromenko/tetris_snake.git && cd tetris_snake && make
+```
+
 **One‑Line Install (macOS)**
 Copy/paste this into Terminal — it installs Homebrew (if needed), sets PATH, installs deps, clones the repo, builds, and launches the menu:
 
