@@ -1,8 +1,6 @@
 **Tetris and Snake for Terminal and Desktop**
 - I built this Snake and Tetris after work simply because it's fun. Bare‑bones, no engines — just ncurses/Qt, build and play.
 
-![alt text](image.png)
-
 If you already have everything installed (Homebrew, ncurses, Qt), just run:
 
 ```
