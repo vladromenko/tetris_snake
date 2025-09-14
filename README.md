@@ -1,4 +1,4 @@
-**A Little After‑Hours Build**
+**Tetris and snake for console and desktop**
 - I built this Snake and Tetris after work simply because it's fun. Bare‑bones, no engines — just ncurses/Qt, build and play.
 
 If you already have everything installed (Homebrew, ncurses, Qt), just run:
