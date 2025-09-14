@@ -6,11 +6,7 @@
 
 #include "brick_game_api.h"
 
-/**
- * @brief Точка входа (инициализация ncurses).
- * @details Настраивает режим терминала, запускает главный цикл и корректно
- *          завершает работу ncurses.
- */
+
 void interface_run(void) {
   initscr();
   cbreak();
@@ -22,11 +18,7 @@ void interface_run(void) {
   endwin();
 }
 
-/**
- * @brief Главный цикл консольного интерфейса.
- * @details Читает ввод, обрабатывает удержание Action, вызывает шаг отрисовки,
- *          завершает по GAMEOVER/Terminate.
- */
+
 void console_loop(void) {
   int running = 1;
   int quit_overlay = 0;
@@ -46,12 +38,7 @@ void console_loop(void) {
   }
 }
 
-/**
- * @brief Выполнить один шаг обновления и отрисовки.
- * @return 1 — продолжать цикл; 0 — выйти (GAMEOVER/Terminate).
- * @details Получает GameInfo_t, рисует кадр, спит по g.speed (или 50 мс в
- * паузе), освобождает ресурсы через freeGameInfo().
- */
+
 int step_and_draw_once(void) {
   int should_continue = 1;
   GameInfo_t g = updateCurrentState();
@@ -72,10 +59,7 @@ int step_and_draw_once(void) {
   return should_continue;
 }
 
-/**
- * @brief Полная отрисовка интерфейса кадра (поле, HUD, превью, оверлей).
- * @param g Снимок состояния игры (матрицы/поля/флаги).
- */
+
 void interface_draw(const GameInfo_t *g) {
   int cellw = 2;
   int cellh = 1;
@@ -102,11 +86,7 @@ void interface_draw(const GameInfo_t *g) {
   refresh();
 }
 
-/**
- * @brief Нарисовать прямоугольный «GAME OVER» поверх поля.
- * @param top,left,rows,cols Геометрия поля (в клетках) и позиция.
- * @param cellw,cellh Размер клетки в символах (для расчёта рамки).
- */
+
 void draw_game_over_banner_over_field(int top, int left, int rows, int cols,
                                       int cellw, int cellh) {
   int field_w = cols * cellw + 2;
@@ -150,11 +130,7 @@ void draw_game_over_banner_over_field(int top, int left, int rows, int cols,
   attroff(A_BOLD);
 }
 
-/**
- * @brief Нарисовать HUD (Score/Record/Level/Speed и подсказки).
- * @param top,left Позиция HUD в символах.
- * @param g Снимок состояния игры; допускается NULL.
- */
+
 void draw_hud_classic(int top, int left, const GameInfo_t *g) {
   int score = g ? g->score : 0;
   int record = g ? g->high_score : 0;
@@ -189,13 +165,7 @@ void sleep_ms(int ms) {
   nanosleep(&ts, 0);
 }
 
-/**
- * @brief Нарисовать прямоугольную рамку вокруг поля.
- * @param top,left Координаты верхнего левого угла рамки в символах.
- * @param rows,cols Размер поля (в клетках).
- * @param cellw,cellh Размер одной клетки в символах.
- * @details Использует символы ncurses (углы/горизонтальные/вертикальные линии).
- */
+
 void draw_border_classic(int top, int left, int rows, int cols, int cellw,
                          int cellh) {
   int width = cols * cellw + 2;
@@ -221,13 +191,7 @@ void draw_border_classic(int top, int left, int rows, int cols, int cellw,
   }
 }
 
-/**
- * @brief Отрисовать матрицу поля/превью в псевдографике.
- * @param top,left Позиция области рисования.
- * @param rows,cols Размер матрицы (клетки).
- * @param cellw,cellh Размер клетки в символах.
- * @details Печатает "[]" для занятых клеток и пробелы — для пустых.
- */
+
 void draw_matrix_classic(int top, int left, int **grid, int rows, int cols,
                          int cellw, int cellh) {
   int y = 0;
@@ -251,12 +215,7 @@ void draw_matrix_classic(int top, int left, int **grid, int rows, int cols,
   }
 }
 
-/**
- * @brief Сопоставить нажатую клавишу ncurses действию UserAction_t.
- * @param ch Код клавиши из getch().
- * @param[out] act Результирующее действие.
- * @param[out] hold Признак удержания (для Down/Space).
- */
+
 void map_key_to_action(int ch, UserAction_t *act, int *hold) {
   *act = Action;
   *hold = 0;
@@ -282,10 +241,7 @@ void map_key_to_action(int ch, UserAction_t *act, int *hold) {
   }
 }
 
-/**
- * @brief Считать последнюю нажатую клавишу, очищая буфер ввода.
- * @return Код последней клавиши или -1, если ввода нет.
- */
+
 int read_last_keypress(void) {
   int ch = getch();
   int last = -1;
@@ -296,13 +252,7 @@ int read_last_keypress(void) {
   return last;
 }
 
-/**
- * @brief Преобразовать последнюю клавишу в действие и отправить в игру.
- * @param last Код клавиши (или -1).
- * @param[in,out] action_down Флаг «Space удерживается» для авто‑повтора.
- * @param[in,out] quit_overlay Флаг запроса выхода (по Terminate).
- * @details Обрабатывает удержание Action (Space), Down (мгновенный сброс hold).
- */
+
 void process_last_key(int last, int *action_down, int *quit_overlay) {
   if (last == -1) return;
   UserAction_t a;

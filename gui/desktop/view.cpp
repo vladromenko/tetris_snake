@@ -5,18 +5,7 @@
 #include <QPainter>
 #include <QTimer>
 
-/**
- * @brief Событие перерисовки виджета.
- * @details
- *  Выполняет полный цикл отрисовки кадра:
- *  1) включает QPainter (выкл. для чёткой сетки);
- *  2) вычисляет рабочие области: общий прямоугольник, поле (board) и HUD;
- *  3) запрашивает «снимок» состояния игры через updateCurrentState();
- *  4) рисует поле (матрицу) или «заглушку», если field == nullptr;
- *  5) рисует HUD (очки, рекорд, уровень, скорость, флаги паузы/конца игры);
- *  6) освобождает снимок состояния freeGameInfo(&g).
- *
- */
+
 void View::paintEvent(QPaintEvent*) {
   QPainter p(this);
   p.setRenderHint(QPainter::Antialiasing, false);
@@ -82,12 +71,7 @@ void View::paintEvent(QPaintEvent*) {
   }
 }
 
-/**
- * @brief Нарисовать рамку вокруг области контента.
- * @param p Контекст рисования (QPainter), уже привязанный к виджету.
- * @param r Внешние границы области контента.
- * @post Состояние кисти/пера восстанавливается (save/restore).
- */
+
 void View::drawBorder(QPainter& p, const QRect& r) {
   p.save();
   p.setPen(QPen(QColor(90, 90, 90), 2));
@@ -95,17 +79,7 @@ void View::drawBorder(QPainter& p, const QRect& r) {
   p.restore();
 }
 
-/**
- * @brief Нарисовать логическое поле игры по матрице целых чисел.
- * @details
- *  Матрица grid имеет размер rows×cols; ноль означает пустую клетку,
- *  положительное значение — заполненную.
- *
- * @param grid  Матрица поля (double pointer int**).
- * @param rows  Количество строк матрицы (по вертикали).
- * @param cols  Количество столбцов матрицы (по горизонтали).
- * @param area  Экранная область, куда вписывается поле.
- */
+
 void View::drawMatrix(QPainter& p, int** grid, int rows, int cols,
                       const QRect& area) {
   p.save();
@@ -140,13 +114,7 @@ void View::drawMatrix(QPainter& p, int** grid, int rows, int cols,
   p.restore();
 }
 
-/**
- * @brief Нарисовать HUD (очки, рекорд, уровень, скорость, статусы).
- * @param p         Контекст рисования.
- * @param bounds    Прямоугольная область HUD.
- * @param g         Снимок состояния игры (значения не изменяются).
- * @param game_over Признак завершения игры (для отдельного сообщения).
- */
+
 void View::drawHUD(QPainter& p, const QRect& bounds, const GameInfo_t& g,
                    bool game_over) {
   p.save();
@@ -182,16 +150,7 @@ void View::drawHUD(QPainter& p, const QRect& bounds, const GameInfo_t& g,
   p.restore();
 }
 
-/**
- * @brief Конструктор вида игры.
- * @details
- *  - Включает приём фокуса с клавиатуры (@c Qt::StrongFocus).
- *  - Устанавливает минимальный размер виджета.
- *  - Создаёт таймер перерисовки, подключает его к @ref View::onTick и
- * запускает.
- *
- * @post Таймер запущен с периодом 32 мс
- */
+
 View::View(QWidget* parent) : QWidget(parent) {
   setFocusPolicy(Qt::StrongFocus);
   setMinimumSize(480, 360);
@@ -201,23 +160,12 @@ View::View(QWidget* parent) : QWidget(parent) {
   timer_->start(32);
 }
 
-/**
- * @brief Деструктор вида.
- * @details Останавливает таймер перерисовки, если он был создан.
- * @post Таймер больше не генерирует события @c timeout().
- */
+
 View::~View() {
   if (timer_) timer_->stop();
 }
 
-/**
- * @brief Таймерный тик: обновление состояния и перерисовка.
- * @details
- *  Вызывается каждые 32 мс. Если игра завершена, выставляет @c quit_pending_
- *  (для последующей обработки в @ref paintEvent), затем инициирует перерисовку
- *  виджета методом @ref QWidget::update().
- *
- */
+
 void View::onTick() {
   if (isGameOver()) {
     quit_pending_ = true;
@@ -225,12 +173,7 @@ void View::onTick() {
   update();
 }
 
-/**
- * @brief Сопоставить Qt‑код клавиши абстрактному действию `UserAction_t`.
- * @param key Код клавиши из события Qt.
- * @param[out] out Заполняется соответствующим действием.
- * @return true, если удалось сопоставить; иначе false.
- */
+
 static bool mapKeyToAction(int key, UserAction_t& out) {
   switch (key) {
     case Qt::Key_Left:

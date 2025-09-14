@@ -4,21 +4,7 @@ extern int t_is_fast_drop(void);
 extern int t_take_terminate(void);
 extern int t_take(UserAction_t *out);
 
-/**
- * @brief Выполнить один шаг конечного автомата.
- * @details
- *  - Считывает текущее состояние.
- *  - Для всех состояний, кроме START, проверяет однократный флаг завершения
- *   — при наличии переход в GAMEOVER.
- *  - Иначе вызывает обработчик состояния:
- *      • START  → logic_start()
- *      • SPAWN  → logic_spawn()
- *      • INPUT  → logic_input()
- *      • DROP   → logic_drop()
- *      • FIX    → logic_fix()
- *      • PAUSED → logic_paused()
- *      • GAMEOVER → logic_gameover()
- */
+
 void fsm_step(void) {
   TetrisState s = t_get_state();
   int terminated = 0;
@@ -49,12 +35,7 @@ void fsm_step(void) {
   }
 }
 
-/**
- * @brief Обработчик состояния START — старт новой партии.
- * @details Сбрасывает ввод, очищает поле ,
- * обнуляет тик‑таймер, перечитывает
- * рекорд, формирует предпросмотр следующей фигуры и переводит в `STATE_SPAWN`.
- */
+
 void logic_start(void) {
   t_input_reset();
   t_clear_field();
@@ -64,12 +45,7 @@ void logic_start(void) {
   t_set_state(STATE_SPAWN);
 }
 
-/**
- * @brief Обработчик состояния SPAWN — создает новую фигуру.
- * @details Пытается создать новую фигуру. Если успешно,
- *          обновляет предпросмотр и переходит в
- * INPUT. Иначе — GAMEOVER.
- */
+
 void logic_spawn(void) {
   int ok = t_spawn_new_piece();
   TetrisState next = STATE_GAMEOVER;
@@ -80,19 +56,7 @@ void logic_spawn(void) {
   t_set_state(next);
 }
 
-/**
- * @brief Обработчик состояния INPUT — обработка очереди ввода.
- * @details
- *  Считывает одно действие, если оно есть, и выполняет:
- *   - Terminate → GAMEOVER
- *   - Left/Right → попытка сдвига фигуры (`t_try_move(±1,0)`).
- *   - Up → поворот по часовой (`t_rotate_cw()`).
- *   - Action → жёсткий дроп (`t_hard_drop()`), затем переход в FIX.
- *   - Down → если можно падать (`t_can_drop()`), опустить на 1 (`t_drop_one()`)
- * и остаться в INPUT; иначе перейти в FIX.
- *   - Pause → установить паузу и перейти в PAUSED.
- *  Если действия нет — по умолчанию следующий шаг будет DROP.
- */
+
 void logic_input(void) {
   TetrisState next = STATE_DROP;
   UserAction_t a;
@@ -123,16 +87,7 @@ void logic_input(void) {
   t_set_state(next);
 }
 
-/**
- * @brief Обработчик состояния DROP — падение фигуры по таймеру/ускорению.
- * @details
- *  - При удержании быстрого падения или когда таймер
- *    готов, проверяет возможность падения и либо опускает фигуру
- *    на 1, оставаясь в INPUT, либо переходит в FIX, если
- *    дальше падать нельзя.
- *  - Если ни ускорение, ни таймер не готовы — остаётся переход к INPUT без
- *    действий (ожидание следующего шага).
- */
+
 void logic_drop(void) {
   TetrisState next = STATE_INPUT;
   if (t_is_fast_drop() != 0) {
@@ -153,14 +108,7 @@ void logic_drop(void) {
   t_set_state(next);
 }
 
-/**
- * @brief Обработчик состояния FIX — зафиксировать фигуру и обновить поле.
- * @details
- *  - Приклеивает активную фигуру к полю. Если это не
- *    переводит игру в GAMEOVER, очищает заполненные линии,
- * сбрасывает тик‑таймер и
- * переходит в SPAWN.
- */
+
 void logic_fix(void) {
   t_fix_to_board();
   if (t_get_state() != STATE_GAMEOVER) {
@@ -170,11 +118,7 @@ void logic_fix(void) {
   }
 }
 
-/**
- * @brief Обработчик состояния PAUSED — ожидание снятия паузы.
- * @details Считывает действие: Terminate → GAMEOVER; Pause → снять паузу и
- *          перейти в INPUT. Иначе остаётся в PAUSED.
- */
+
 void logic_paused(void) {
   TetrisState next = STATE_PAUSED;
   UserAction_t a;
@@ -189,11 +133,7 @@ void logic_paused(void) {
   t_set_state(next);
 }
 
-/**
- * @brief Обработчик состояния GAMEOVER — ожидание рестарта/выхода.
- * @details Считывает действие: Terminate оставляет GAMEOVER; Start — переход
- *          в START (начало новой партии).
- */
+
 void logic_gameover(void) {
   TetrisState next = STATE_GAMEOVER;
   UserAction_t a;

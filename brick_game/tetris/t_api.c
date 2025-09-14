@@ -1,11 +1,7 @@
 #include "brick_game_api.h"
 #include "tetris.h"
 
-/**
- * @brief Передать действие пользователя в тетрис.
- * @param action Тип действия.
- * @param hold   Флаг «удержания» (1 — кнопка удерживается; 0 — отпускание).
- */
+
 void userInput(UserAction_t action, bool hold) {
   t_init();
   int should_handle = 1;
@@ -17,17 +13,7 @@ void userInput(UserAction_t action, bool hold) {
   }
 }
 
-/**
- * @brief Выполнить один шаг FSM и вернуть снимок состояния для UI.
- * @return Заполненная структура GameInfo_t (матрицы поля и следующей фигуры,
- *         счёт/рекорд, уровень, скорость в мс, флаг паузы).
- * @details
- *  - Инициализирует движок при первом вызове.
- *  - Делает шаг автомата.
- *  - Перерендерит матрицу поля: очищает и наносит активную
- *    фигуру.
- *  - Собирает GameInfo
- */
+
 GameInfo_t updateCurrentState(void) {
   t_init();
 
@@ -47,10 +33,7 @@ GameInfo_t updateCurrentState(void) {
   return g;
 }
 
-/**
- * @brief Признак завершения игры.
- * @return 1 — GAMEOVER, 0 — иначе.
- */
+
 int isGameOver(void) {
   t_init();
   int result = 0;

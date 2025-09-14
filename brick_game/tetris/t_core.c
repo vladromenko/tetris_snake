@@ -75,15 +75,7 @@ static void bind_rows(void) {
   }
 }
 
-/**
- * @brief Инициализировать единичное состояние тетриса.
- * @details
- *  Один раз за процесс обнуляет ядро, связывает указатели строк, выставляет
- *  стартовые значения (уровень, тики, состояние), перемешивает «мешок» фигур и
- *  подготавливает предпросмотр следующей фигуры. Также подгружает рекорд и
- *  гарантирует, что он не понизится.
- * @note Вызывается из C‑API перед каждым действием/снимком.
- */
+
 void t_init(void) {
   static int inited = 0;
 
@@ -123,12 +115,10 @@ void t_init(void) {
   }
 }
 
-/** @brief Текущий рекорд. */
+
 int t_get_high_score(void) { return S.high_score; }
 
-/**
- * @brief Перечитать рекорд с диска без понижения текущего значения.
- */
+
 void t_reload_high_score(void) {
   int prev = S.high_score;
   load_high_score();
@@ -137,14 +127,14 @@ void t_reload_high_score(void) {
   }
 }
 
-/** @brief Доступ к строкам матрицы поля для UI. */
+
 int **t_field_rows(void) { return S.field_rows; }
-/** @brief Доступ к строкам предпросмотра следующей фигуры (4×4). */
+
 int **t_next_rows(void) { return S.next_rows; }
 
-/** @brief Текущий счёт. */
+
 int t_get_score(void) { return S.score; }
-/** @brief Текущий уровень. */
+
 int t_get_level(void) { return S.level; }
 
 int t_get_speed_ms(void) {
@@ -156,35 +146,29 @@ int t_get_speed_ms(void) {
   if (ms < 8) ms = 8;
   return ms;
 }
-/** @brief Признак паузы. */
+
 int t_is_paused(void) { return S.paused; }
-/** @brief Установить/снять паузу. */
+
 void t_set_paused(int v) { S.paused = (v != 0); }
 
-/** @brief Текущий лимит тиков до падения (для отладки/UI). */
+
 int t_get_tick_limit(void) { return S.tick_limit; }
 
-/** @brief Увеличить скорость (уменьшить лимит тиков), не ниже 2. */
+
 void t_speed_inc(void) {
   if (S.tick_limit > 2) {
     S.tick_limit -= 1;
   }
 }
 
-/** @brief Уменьшить скорость (увеличить лимит тиков), верхняя граница 60. */
+
 void t_speed_dec(void) {
   if (S.tick_limit < 60) {
     S.tick_limit += 1;
   }
 }
 
-/**
- * @brief Проверить готовность тикового шага падения.
- * @details
- *  Синхронизирует tick_limit с уровнем (через tick_limit_for_level),
- *  инкрементирует tick и при превышении лимита обнуляет счётчик и
- *  возвращает 1 (готов к падению). Иначе возвращает 0.
- */
+
 int t_tick_ready(void) {
   int target = tick_limit_for_level(S.level);
   if (S.tick_limit != target) {
@@ -200,20 +184,16 @@ int t_tick_ready(void) {
   return ready;
 }
 
-/** @brief Сбросить тик‑счётчик (используется в START/FIX). */
+
 void t_tick_reset(void) { S.tick = 0; }
 
-/** @brief Получить текущее состояние FSM. */
+
 TetrisState t_get_state(void) { return S.state; }
 
-/** @brief Установить состояние FSM. */
+
 void t_set_state(TetrisState newState) { S.state = newState; }
 
-/**
- * @brief Очистить матрицу field (буфер для UI).
- * @details Используется при старте партии (STATE_START) и перед перерисовкой
- *          кадра в API, чтобы затем наложить активную фигуру.
- */
+
 void t_clear_field(void) {
   int row = 0;
   while (row < T_ROWS) {
@@ -226,11 +206,7 @@ void t_clear_field(void) {
   }
 }
 
-/**
- * @brief Скопировать содержимое board → field.
- * @details Поле board хранит зафиксированные блоки; field — буфер для UI,
- *          куда поверх копии накладывается активная фигура.
- */
+
 void t_copy_board_to_field(void) {
   int row = 0;
   while (row < T_ROWS) {
@@ -243,9 +219,7 @@ void t_copy_board_to_field(void) {
   }
 }
 
-/**
- * @brief Проверка коллизии ячейки активной фигуры при смещении.
- */
+
 static int blocked_at_cell(int shapeRow, int shapeCol, int dx, int dy) {
   int blocked = 0;
   if (S.act.shape.m[shapeRow][shapeCol] != 0) {
@@ -260,9 +234,7 @@ static int blocked_at_cell(int shapeRow, int shapeCol, int dx, int dy) {
   return blocked;
 }
 
-/**
- * @brief Нанести одну ячейку активной фигуры в field (если в границах).
- */
+
 static void blit_cell_to_field(int shapeRow, int shapeCol) {
   if (S.act.shape.m[shapeRow][shapeCol] == 0) {
     return;
@@ -275,7 +247,7 @@ static void blit_cell_to_field(int shapeRow, int shapeCol) {
   }
 }
 
-/** @brief Повернуть активную фигуру на 90° против часовой (внутр.). */
+
 static void rotate_active_ccw(void) {
   Shape src = S.act.shape;
   int r = 0;
@@ -289,7 +261,7 @@ static void rotate_active_ccw(void) {
   }
 }
 
-/** @brief Повернуть активную фигуру на 90° по часовой (внутр.). */
+
 static void rotate_active_cw(void) {
   Shape src = S.act.shape;
   int r = 0;
@@ -303,9 +275,7 @@ static void rotate_active_cw(void) {
   }
 }
 
-/**
- * @brief Сформировать field для UI: board + активная фигура.
- */
+
 void t_render_active_to_field(void) {
   t_copy_board_to_field();
   int r = 0;
@@ -319,12 +289,7 @@ void t_render_active_to_field(void) {
   }
 }
 
-/**
- * @brief Проверить, можно ли сдвинуть активную фигуру.
- * @param deltaX Смещение по X (−1/0/+1).
- * @param deltaY Смещение по Y (0/1).
- * @return 1 — можно; 0 — заблокировано.
- */
+
 int t_can_move(int deltaX, int deltaY) {
   int canMove = 1;
   int r = 0;
@@ -341,10 +306,7 @@ int t_can_move(int deltaX, int deltaY) {
   return canMove;
 }
 
-/**
- * @brief Попробовать сдвинуть активную фигуру.
- * @return 1 — удалось; 0 — нет.
- */
+
 int t_try_move(int deltaX, int deltaY) {
   int moved = 0;
   if (t_can_move(deltaX, deltaY) != 0) {
@@ -355,9 +317,7 @@ int t_try_move(int deltaX, int deltaY) {
   return moved;
 }
 
-/**
- * @brief Повернуть активную фигуру по часовой с откатом при коллизии.
- */
+
 void t_rotate_cw(void) {
   rotate_active_cw();
   if (t_can_move(0, 0) == 0) {
@@ -365,26 +325,20 @@ void t_rotate_cw(void) {
   }
 }
 
-/**
- * @brief Проверить, можно ли опустить фигуру на 1 клетку вниз.
- */
+
 int t_can_drop(void) {
   int result = t_can_move(0, 1);
   return result;
 }
 
-/**
- * @brief Опустить фигуру на 1 клетку (если возможно).
- */
+
 void t_drop_one(void) {
   if (t_can_move(0, 1) != 0) {
     S.act.y += 1;
   }
 }
 
-/**
- * @brief Жёсткий дроп: опускает фигуру, пока возможно.
- */
+
 void t_hard_drop(void) {
   int canDropMore = t_can_drop();
   while (canDropMore != 0) {
@@ -393,11 +347,7 @@ void t_hard_drop(void) {
   }
 }
 
-/**
- * @brief Приклеить активную фигуру к board и проверить GAMEOVER.
- * @details Переносит занятые ячейки активной фигуры в `board`. Если часть
- *          оказалась выше верхней границы — устанавливает GAMEOVER.
- */
+
 void t_fix_to_board(void) {
   int out_of_top = 0;
   int y = 0;
@@ -423,7 +373,7 @@ void t_fix_to_board(void) {
   }
 }
 
-/** @brief Отметить полностью заполненные строки (внутр.). */
+
 static int mark_full_rows(int fullRow[T_ROWS]) {
   int cleared = 0;
   for (int r = 0; r < T_ROWS; ++r) {
@@ -439,7 +389,7 @@ static int mark_full_rows(int fullRow[T_ROWS]) {
   return cleared;
 }
 
-/** @brief Сжать поле вниз, пропуская отмеченные строки*/
+
 static int compress_board_down(const int fullRow[T_ROWS]) {
   int writeRow = T_ROWS - 1;
   for (int r = T_ROWS - 1; r >= 0; --r) {
@@ -453,7 +403,7 @@ static int compress_board_down(const int fullRow[T_ROWS]) {
   return writeRow;
 }
 
-/** @brief Заполнить верх пустыми строками после сжатия */
+
 static void fill_top_zeros_from(int writeRow) {
   while (writeRow >= 0) {
     for (int c = 0; c < T_COLS; ++c) {
@@ -463,11 +413,7 @@ static void fill_top_zeros_from(int writeRow) {
   }
 }
 
-/**
- * @brief Начислить очки, обновить уровень/скорость по числу очищенных линий.
- * @details 1→100, 2→300, 3→700, 4→1500; лимит тиков ускоряется с ростом уровня.
- * @ingroup FSM_FIX
- */
+
 static void apply_scoring_and_level(int cleared) {
   if (cleared > 0) {
     int points = 0;
@@ -504,10 +450,7 @@ static void apply_scoring_and_level(int cleared) {
   }
 }
 
-/**
- * @brief Очистить заполненные линии и обновить скоринг/уровень.
- * @return Количество очищенных линий.
- */
+
 int t_clear_full_lines(void) {
   int fullRow[T_ROWS];
   int cleared = mark_full_rows(fullRow);
@@ -517,13 +460,7 @@ int t_clear_full_lines(void) {
   return cleared;
 }
 
-/**
- * @brief Спаун новой активной фигуры из «мешка» 7‑фигур.
- * @return 1 — успешно; 0 — нет места (GAMEOVER).
- * @details Переносит next_id в активную фигуру, берёт новый next_id,
- *  ставит по центру фигуру и ставит y=-1 (над полем). Проверяет
- *          возможность хода вниз/статуса.
- */
+
 int t_spawn_new_piece(void) {
   int ok = 1;
 
@@ -547,9 +484,7 @@ int t_spawn_new_piece(void) {
   return ok;
 }
 
-/**
- * @brief Построить 4×4 предпросмотр фигуры `next_id`.
- */
+
 void t_build_next_preview(void) {
   int row = 0;
   while (row < 4) {
@@ -563,7 +498,7 @@ void t_build_next_preview(void) {
 }
 
 static const char *HIGHSCORE_FILE = "tetris_highscore.txt";
-/** @brief Загрузить рекорд из файла */
+
 static void load_high_score(void) {
   FILE *f = fopen(HIGHSCORE_FILE, "r");
   int value = 0;
@@ -584,7 +519,7 @@ static void load_high_score(void) {
   }
 }
 
-/** @brief Сохранить рекорд в файл */
+
 static void save_high_score(void) {
   FILE *f = fopen(HIGHSCORE_FILE, "w");
   if (f != NULL) {
@@ -593,7 +528,7 @@ static void save_high_score(void) {
   }
 }
 
-/** @brief Перемешать «мешок» из 7 фигур  */
+
 static void refill_bag(void) {
   for (int i = 0; i < 7; ++i) {
     S.bag[i] = i;

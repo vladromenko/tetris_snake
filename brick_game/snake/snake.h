@@ -5,7 +5,7 @@
 #include <deque>
 #include <string>
 
-namespace s21 {
+namespace snake {
 
 struct Point {
   int x;
@@ -100,8 +100,8 @@ class SnakeGame {
 };
 
 SnakeGame& GlobalSnake();
-#define g_snake GlobalSnake()
+}  // namespace snake
 
-}  // namespace s21
+#define g_snake snake::GlobalSnake()
 
 #endif
